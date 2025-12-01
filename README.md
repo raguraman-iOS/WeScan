@@ -52,13 +52,23 @@ It's modelled after `UIImagePickerController`, which makes it a breeze to use.
 
 The [Swift Package Manager](https://swift.org/package-manager/) is a tool for automating the distribution of Swift code and is integrated into the `swift` compiler. It is in early development, but WeScan does support its use on supported platforms.
 
+#### Using Xcode
+
+1. In Xcode, select **File** → **Add Packages...**
+2. Enter the repository URL: `https://github.com/raguraman-iOS/WeScan.git`
+3. Select the version rule and click **Add Package**
+
+#### Using Package.swift
+
 Once you have your Swift package set up, adding WeScan as a dependency is as easy as adding it to the `dependencies` value of your `Package.swift`.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/WeTransfer/WeScan.git", .upToNextMajor(from: "2.1.0"))
+    .package(url: "https://github.com/raguraman-iOS/WeScan.git", .upToNextMajor(from: "2.1.0"))
 ]
 ```
+
+**Note:** This repository is a fork of the original [WeTransfer/WeScan](https://github.com/WeTransfer/WeScan) with additional features including multiple page scanning with reordering, add, and delete capabilities.
 
 ## Usage
 
@@ -165,12 +175,12 @@ ImageScannerController *scannerViewController = [[ImageScannerController alloc] 
 
 As the creators, and maintainers of this project, we're glad to invite contributors to help us stay up to date. Please take a moment to review [the contributing document](CONTRIBUTING.md) in order to make the contribution process easy and effective for everyone involved.
 
-- If you **found a bug**, open an [issue](https://github.com/WeTransfer/WeScan/issues).
-- If you **have a feature request**, open an [issue](https://github.com/WeTransfer/WeScan/issues).
-- If you **want to contribute**, submit a [pull request](https://github.com/WeTransfer/WeScan/pulls).
+- If you **found a bug**, open an [issue](https://github.com/raguraman-iOS/WeScan/issues).
+- If you **have a feature request**, open an [issue](https://github.com/raguraman-iOS/WeScan/issues).
+- If you **want to contribute**, submit a [pull request](https://github.com/raguraman-iOS/WeScan/pulls).
 
 <br>
 
 ## License
 
-**WeScan** is available under the MIT license. See the [LICENSE](https://github.com/WeTransfer/WeScan/blob/develop/LICENSE) file for more info.
+**WeScan** is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
