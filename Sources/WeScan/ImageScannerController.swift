@@ -20,6 +20,16 @@ public protocol ImageScannerControllerDelegate: NSObjectProtocol {
     /// - Discussion: Your delegate's implementation of this method should dismiss the image scanner controller.
     func imageScannerController(_ scanner: ImageScannerController, didFinishScanningWithResults results: ImageScannerResults)
 
+    /// Tells the delegate that the user scanned multiple documents (when multiple page scanning is enabled).
+    ///
+    /// - Parameters:
+    ///   - scanner: The scanner controller object managing the scanning interface.
+    ///   - results: An array of results from the user scanning multiple pages with the camera.
+    /// - Discussion: Your delegate's implementation of this method should dismiss the image scanner controller.
+    ///   This method is called when `isMultiplePageScanningEnabled` is `true`.
+    @available(iOS 10.0, *)
+    func imageScannerController(_ scanner: ImageScannerController, didFinishScanningWithMultipleResults results: [ImageScannerResults])
+
     /// Tells the delegate that the user cancelled the scan operation.
     ///
     /// - Parameters:
@@ -35,6 +45,18 @@ public protocol ImageScannerControllerDelegate: NSObjectProtocol {
     func imageScannerController(_ scanner: ImageScannerController, didFailWithError error: Error)
 }
 
+/// Extension to provide a default implementation for backward compatibility.
+extension ImageScannerControllerDelegate {
+    @available(iOS 10.0, *)
+    func imageScannerController(_ scanner: ImageScannerController, didFinishScanningWithMultipleResults results: [ImageScannerResults]) {
+        // Default implementation: call the single result method for each result, or just the first one
+        // This provides backward compatibility but delegates should implement this method for proper multiple page handling
+        if let firstResult = results.first {
+            imageScannerController(scanner, didFinishScanningWithResults: firstResult)
+        }
+    }
+}
+
 /// A view controller that manages the full flow for scanning documents.
 /// The `ImageScannerController` class is meant to be presented. It consists of a series of 3 different screens which guide the user:
 /// 1. Uses the camera to capture an image with a rectangle that has been detected.
@@ -44,6 +66,14 @@ public final class ImageScannerController: UINavigationController {
 
     /// The object that acts as the delegate of the `ImageScannerController`.
     public weak var imageScannerDelegate: ImageScannerControllerDelegate?
+
+    /// Whether multiple page scanning is enabled. When `true`, users can scan multiple pages with reordering, add, and delete features.
+    /// When `false`, the traditional single-page scanning flow is used.
+    /// Defaults to `false`.
+    public var isMultiplePageScanningEnabled: Bool = false
+
+    /// Accumulated pages when multiple page scanning is enabled.
+    internal var accumulatedPages: [ImageScannerResults] = []
 
     // MARK: - Life Cycle
 
@@ -60,10 +90,12 @@ public final class ImageScannerController: UINavigationController {
         return .portrait
     }
 
-    public required init(image: UIImage? = nil, delegate: ImageScannerControllerDelegate? = nil) {
+    public required init(image: UIImage? = nil, delegate: ImageScannerControllerDelegate? = nil, isMultiplePageScanningEnabled: Bool = false) {
         super.init(rootViewController: ScannerViewController())
 
         self.imageScannerDelegate = delegate
+        self.isMultiplePageScanningEnabled = isMultiplePageScanningEnabled
+        self.accumulatedPages = []
 
         if #available(iOS 13.0, *) {
             navigationBar.tintColor = .label
@@ -125,6 +157,7 @@ public final class ImageScannerController: UINavigationController {
     }
 
     public func resetScanner() {
+        // Keep accumulated pages when resetting in multiple page mode
         setViewControllers([ScannerViewController()], animated: true)
     }
 

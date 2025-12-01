@@ -52,7 +52,9 @@ final class ReviewViewController: UIViewController {
         return button
     }()
 
-    private let results: ImageScannerResults
+    private var results: ImageScannerResults
+    var isFromMultiplePageFlow = false
+    var onPageUpdated: ((ImageScannerResults) -> Void)?
 
     // MARK: - Life Cycle
 
@@ -176,8 +178,33 @@ final class ReviewViewController: UIViewController {
         newResults.croppedScan.rotate(by: rotationAngle)
         newResults.enhancedScan?.rotate(by: rotationAngle)
         newResults.doesUserPreferEnhancedScan = isCurrentlyDisplayingEnhancedImage
-        imageScannerController.imageScannerDelegate?
-            .imageScannerController(imageScannerController, didFinishScanningWithResults: newResults)
+
+        // If this is from multiple page flow, update the page and return
+        if isFromMultiplePageFlow {
+            onPageUpdated?(newResults)
+            navigationController?.popViewController(animated: true)
+            return
+        }
+
+        // Check if multiple page scanning is enabled
+        if imageScannerController.isMultiplePageScanningEnabled {
+            // Add to accumulated pages if they exist, otherwise start with this page
+            var pages = imageScannerController.accumulatedPages
+            if pages.isEmpty {
+                pages = [newResults]
+            } else {
+                pages.append(newResults)
+            }
+            imageScannerController.accumulatedPages = pages
+            
+            // Navigate to multiple page review
+            let multiplePageVC = MultiplePageReviewViewController(scannedPages: pages, imageScannerController: imageScannerController)
+            navigationController?.pushViewController(multiplePageVC, animated: true)
+        } else {
+            // Traditional single page flow
+            imageScannerController.imageScannerDelegate?
+                .imageScannerController(imageScannerController, didFinishScanningWithResults: newResults)
+        }
     }
 
 }

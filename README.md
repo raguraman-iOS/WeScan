@@ -31,7 +31,7 @@ It's modelled after `UIImagePickerController`, which makes it a breeze to use.
 - [x] Auto scan and flash support
 - [x] Support for both PDF and UIImage
 - [x] Translated to English, Chinese, Italian, Portuguese, and French
-- [ ] Batch scanning
+- [x] Batch scanning
 
 ## Demo
 
@@ -103,6 +103,46 @@ let scannerViewController = ImageScannerController()
 scannerViewController.imageScannerDelegate = self
 present(scannerViewController, animated: true)
 ```
+
+### Multiple Page Scanning (Batch Scanning)
+
+WeScan supports scanning multiple pages with reordering, add, and delete features. To enable this functionality:
+
+1. Set the `isMultiplePageScanningEnabled` property to `true` when creating the scanner:
+
+```swift
+let scannerViewController = ImageScannerController(isMultiplePageScanningEnabled: true)
+scannerViewController.imageScannerDelegate = self
+present(scannerViewController, animated: true)
+```
+
+2. Implement the `didFinishScanningWithMultipleResults` delegate method to receive an array of results:
+
+```swift
+func imageScannerController(_ scanner: ImageScannerController, didFinishScanningWithMultipleResults results: [ImageScannerResults]) {
+    // The user successfully scanned multiple pages
+    // results is an array of ImageScannerResults, one for each scanned page
+    // You are responsible for dismissing the ImageScannerController
+    scanner.dismiss(animated: true)
+    
+    // Process the results
+    for (index, result) in results.enumerated() {
+        let image = result.doesUserPreferEnhancedScan ? 
+            (result.enhancedScan?.image ?? result.croppedScan.image) : 
+            result.croppedScan.image
+        // Use the image as needed
+        print("Page \(index + 1): \(image.size)")
+    }
+}
+```
+
+**Features:**
+- **Reordering**: Long press and drag pages to reorder them
+- **Add Pages**: Tap the "+" button to scan additional pages
+- **Delete Pages**: Tap the "X" button on any page to remove it
+- **Edit Individual Pages**: Tap on any page to edit it individually
+
+**Note:** When `isMultiplePageScanningEnabled` is `false` (the default), the traditional single-page scanning flow is used, and the `didFinishScanningWithResults` method is called instead.
 
 ### Objective-C
 

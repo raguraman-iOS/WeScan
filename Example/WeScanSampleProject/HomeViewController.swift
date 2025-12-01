@@ -134,7 +134,7 @@ final class HomeViewController: UIViewController {
     }
 
     func scanImage() {
-        let scannerViewController = ImageScannerController(delegate: self)
+        let scannerViewController = ImageScannerController(delegate: self, isMultiplePageScanningEnabled: true)
         scannerViewController.modalPresentationStyle = .fullScreen
 
         if #available(iOS 13.0, *) {
@@ -156,6 +156,11 @@ final class HomeViewController: UIViewController {
 }
 
 extension HomeViewController: ImageScannerControllerDelegate {
+    func imageScannerController(_ scanner: WeScan.ImageScannerController, didFinishScanningWithMultipleResults results: [WeScan.ImageScannerResults]) {
+        print("document count \(results.count)")
+        scanner.dismiss(animated: true, completion: nil)
+    }
+    
     func imageScannerController(_ scanner: ImageScannerController, didFailWithError error: Error) {
         assertionFailure("Error occurred: \(error)")
     }
