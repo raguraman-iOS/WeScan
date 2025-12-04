@@ -32,6 +32,7 @@ It's modelled after `UIImagePickerController`, which makes it a breeze to use.
 - [x] Support for both PDF and UIImage
 - [x] Translated to English, Chinese, Italian, Portuguese, and French
 - [x] Batch scanning
+- [ ] SwiftUI Wrapper
 
 ## Demo
 
